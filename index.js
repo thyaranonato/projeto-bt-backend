@@ -163,7 +163,7 @@ app.post('/talentos', (req, res) => {
   });
 });
 
-app.put('/talentos/:id', (req, res) => {
+/* app.put('/talentos/:id', (req, res) => {
   pool.connect((err, client) => {
     if (err) {
       return res.status(401).send("Conexão não autorizada")
@@ -202,6 +202,44 @@ app.put('/talentos/:id', (req, res) => {
             }
           })
         });
+      } else {
+        res.status(404).send('Talento não encontrado')
+      }
+    });
+  });
+}); */
+
+app.put('/talentos/:id', (req, res) => {
+  pool.connect((err, client) => {
+    if (err) {
+      return res.status(401).send("Conexão não autorizada")
+    }
+    var sql = 'SELECT * FROM talentos WHERE id=$1'
+    client.query(sql, [req.params.id], (error, result) => {
+      if (error) {
+        return res.status(401).send('Não permitido')
+      }
+      if (result.rowCount > 0) {
+          let sql = 'UPDATE talentos SET nome=$1, sobrenome=$2, fone=$3, email=$4, profissao=$5, cidade=$6, estado=$7, imagem=$8 WHERE id=$9 RETURNING *'
+          let dados = [req.body.nome, req.body.sobrenome, req.body.fone, req.body.email, req.body.profissao, req.body.cidade, req.body.estado, req.body.imagem, req.params.id]
+          client.query(sql, dados, (error2, result2) => {
+            if (error2) {
+              return res.status(401).send('Operação não permitida')
+            } else {
+              let sql = `UPDATE talento_areas SET areas_id=$1 WHERE talentos_id=$2 RETURNING *`
+              let dados = [req.body.area_id, req.params.id]
+              client.query(sql, dados, (error3, result3) => {
+                if (error3) {
+                  return res.status(401).send('Operação não pode ser realizada');
+                } else {
+                  return res.status(200).send({
+                    message: 'Talento alterado com sucesso!',
+                  })
+                }
+              });
+              client.release()
+            }
+          })
       } else {
         res.status(404).send('Talento não encontrado')
       }
