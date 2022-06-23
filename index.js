@@ -269,8 +269,8 @@ app.post('/areas', (req, res) => {
       }
       let sql = 'INSERT INTO areas(area) VALUES ($1) RETURNING *';
       let dados = [req.body.area];
-      client.query(sql, dados, function (error, _resultado) {
-        if (error) {
+      client.query(sql, dados, function (error2, _resultado) {
+        if (error2) {
           return res.status(401).send('Operação não permitida');
         }
         res.status(201).send({
