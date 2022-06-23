@@ -22,18 +22,18 @@ const pool = new pg.Pool({
   }
 });
 
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.status(200).send({
     message: 'Servidor em execução!!'
   });
 });
 
-app.get('/criartabelatalentos', (req, res) => {
+app.get('/criartabelatalentos', (_req, res) => {
   pool.connect((err, client) => {
     if (err) {
       return res.status(401).send('Conexão não autorizada')
     }
-    var sql = 'CREATE TABLE talentos (id SERIAL PRIMARY KEY NOT NULL, nome VARCHAR(20) NOT NULL, sobrenome VARCHAR(70) NOT NULL, fone VARCHAR(15) NOT NULL, email VARCHAR(50) NOT NULL, password VARCHAR(200) NOT NULL, profissao VARCHAR(60) NOT NULL, cidade VARCHAR(100) NOT NULL, estado VARCHAR(30) NOT NULL, imagem VARCHAR(500) NOT NULL, perfil VARCHAR(10))'
+    let sql = 'CREATE TABLE talentos (id SERIAL PRIMARY KEY NOT NULL, nome VARCHAR(20) NOT NULL, sobrenome VARCHAR(70) NOT NULL, fone VARCHAR(15) NOT NULL, email VARCHAR(50) NOT NULL, password VARCHAR(200) NOT NULL, profissao VARCHAR(60) NOT NULL, cidade VARCHAR(100) NOT NULL, estado VARCHAR(30) NOT NULL, imagem VARCHAR(500) NOT NULL, perfil VARCHAR(10))'
     client.query(sql, (error, result) => {
       if (error) {
         return res.status(401).send('Operação não autorizada')
@@ -44,12 +44,12 @@ app.get('/criartabelatalentos', (req, res) => {
   })
 })
 
-app.get('/talentos', (req, res) => {
+app.get('/talentos', (_req, res) => {
   pool.connect((err, client) => {
     if (err) {
       return res.status(401).send('Conexão não autorizada')
     }
-    var sql = "SELECT t.*, a.area FROM TALENTOS t LEFT JOIN talento_areas ta ON t.id = ta.talentos_id LEFT JOIN areas a ON a.id = ta.areas_id ORDER BY a.area, t.nome;"
+    let sql = "SELECT t.*, a.area FROM TALENTOS t LEFT JOIN talento_areas ta ON t.id = ta.talentos_id LEFT JOIN areas a ON a.id = ta.areas_id ORDER BY a.area, t.nome;"
     client.query(sql, (error, result) => {
       if (error) {
         return res.status(401).send('Não autorizado')
@@ -65,7 +65,7 @@ app.get('/talentos/:id', (req, res) => {
     if (err) {
       return res.status(401).send("Conexão não autorizada")
     }
-    var sql = "SELECT  t.*, a.id AS area_id, a.area FROM TALENTOS t INNER JOIN talento_areas ta ON t.id = ta.talentos_id LEFT JOIN areas a ON a.id = ta.areas_id WHERE t.id = $1"
+    let sql = "SELECT  t.*, a.id AS area_id, a.area FROM TALENTOS t INNER JOIN talento_areas ta ON t.id = ta.talentos_id LEFT JOIN areas a ON a.id = ta.areas_id WHERE t.id = $1"
     client.query(sql, [req.params.id], (error, result) => {
       if (error) {
         return res.status(401).send('Operação não autorizada')
@@ -86,7 +86,7 @@ app.post('/talentos/login', (req, res) => {
         return res.status(401).send('Operação não autorizada')
       }
       if (result.rowCount > 0) {
-        bcrypt.compare(req.body.password, result.rows[0].password, (err, results) => {
+        bcrypt.compare(req.body.password, result.rows[0].password, (_err, results) => {
           if (results) {
             let token = jwt.sign({
                 id: result.rows[0].id,
@@ -139,14 +139,14 @@ app.post('/talentos', (req, res) => {
             erro: error.message
           });
         }
-        var sql = 'INSERT INTO talentos (nome, sobrenome, fone, email, password, profissao, cidade, estado, imagem, perfil) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *'
-        var dados = [req.body.nome, req.body.sobrenome, req.body.fone, req.body.email, hash, req.body.profissao, req.body.cidade, req.body.estado, req.body.imagem, 'talento'];
+        let sql = 'INSERT INTO talentos (nome, sobrenome, fone, email, password, profissao, cidade, estado, imagem, perfil) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *'
+        let dados = [req.body.nome, req.body.sobrenome, req.body.fone, req.body.email, hash, req.body.profissao, req.body.cidade, req.body.estado, req.body.imagem, 'talento'];
         client.query(sql, dados, (error, result2) => {
           if (error) {
             return res.status(401).send('Operação não permitida');
           } else {
-            var sql = 'INSERT INTO talento_areas (talentos_id, areas_id) VALUES ($1, $2) RETURNING *'
-            var dados = [result2.rows[0].id, req.body.areas];
+            let sql = 'INSERT INTO talento_areas (talentos_id, areas_id) VALUES ($1, $2) RETURNING *'
+            let dados = [result2.rows[0].id, req.body.areas];
             client.query(sql, dados, (error, result3) => {
               if (error) {
                 return res.status(401).send('Operação não pode ser realizada');
@@ -163,58 +163,12 @@ app.post('/talentos', (req, res) => {
   });
 });
 
-/* app.put('/talentos/:id', (req, res) => {
-  pool.connect((err, client) => {
-    if (err) {
-      return res.status(401).send("Conexão não autorizada")
-    }
-    var sql = 'SELECT * FROM talentos WHERE id=$1'
-    client.query(sql, [req.params.id], (error, result) => {
-      if (error) {
-        return res.status(401).send('Não permitido')
-      }
-      if (result.rowCount > 0) {
-        bcrypt.hash(req.body.password, 10, (error, hash) => {
-          if (error) {
-            return res.status(500).send({
-              mensagem: 'Erro de autenticação',
-              erro: error.message
-            });
-          }
-          let sql = 'UPDATE talentos SET nome=$1, sobrenome=$2, fone=$3, email=$4, password=$5, profissao=$6, cidade=$7, estado=$8, imagem=$9 WHERE id=$10 RETURNING *'
-          let dados = [req.body.nome, req.body.sobrenome, req.body.fone, req.body.email, hash, req.body.profissao, req.body.cidade, req.body.estado, req.body.imagem, req.params.id]
-          client.query(sql, dados, (error2, result2) => {
-            if (error2) {
-              return res.status(401).send('Operação não permitida')
-            } else {
-              let sql = `UPDATE talento_areas SET areas_id=$1 WHERE talentos_id=$2 RETURNING *`
-              let dados = [req.body.area_id, req.params.id]
-              client.query(sql, dados, (error3, result3) => {
-                if (error3) {
-                  return res.status(401).send('Operação não pode ser realizada');
-                } else {
-                  return res.status(200).send({
-                    message: 'Talento alterado com sucesso!',
-                  })
-                }
-              });
-              client.release()
-            }
-          })
-        });
-      } else {
-        res.status(404).send('Talento não encontrado')
-      }
-    });
-  });
-}); */
-
 app.put('/talentos/:id', (req, res) => {
   pool.connect((err, client) => {
     if (err) {
       return res.status(401).send("Conexão não autorizada")
     }
-    var sql = 'SELECT * FROM talentos WHERE id=$1'
+    let sql = 'SELECT * FROM talentos WHERE id=$1'
     client.query(sql, [req.params.id], (error, result) => {
       if (error) {
         return res.status(401).send('Não permitido')
@@ -271,7 +225,7 @@ app.delete('/talentos/:id', (req, res) => {
   })
 })
 
-app.get('/areas', (req, res) => {
+app.get('/areas', (_req, res) => {
   pool.connect((err, client) => {
     if (err) {
       return res.status(401).send('Conexão não autorizada')
@@ -313,8 +267,8 @@ app.post('/areas', (req, res) => {
       if (result.rowCount > 0) {
         return res.status(208).send('Área já existe!');
       }
-      var sql = 'INSERT INTO areas(area) VALUES ($1) RETURNING *';
-      var dados = [req.body.area];
+      let sql = 'INSERT INTO areas(area) VALUES ($1) RETURNING *';
+      let dados = [req.body.area];
       client.query(sql, dados, function (error, resultado) {
         if (error) {
           return res.status(401).send('Operação não permitida');
@@ -334,7 +288,7 @@ app.put('/areas/:id', (req, res) => {
     if (err) {
       return res.status(401).send("Conexão não autorizada")
     }
-    var sql = 'SELECT * FROM areas WHERE id=$1'
+    let sql = 'SELECT * FROM areas WHERE id=$1'
     client.query(sql, [req.params.id], (error, result) => {
       if (error) {
         return res.status(401).send('Não permitido')
