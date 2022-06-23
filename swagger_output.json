@@ -1,0 +1,365 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "REST API",
+    "description": ""
+  },
+  "host": "app-banco-talentos.herokuapp.com",
+  "basePath": "/",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "description": "Servidor está rodando.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/criartabelatalentos": {
+      "get": {
+        "description": "Método para criar tabela no banco de dados.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/talentos": {
+      "get": {
+        "description": "Mostra todos os talentos cadastrados no banco de dados.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "description": "Cadastra um novo talento no banco de dados.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "ana@gmail.com"
+                },
+                "password": {
+                  "example": "123456"
+                },
+                "nome": {
+                  "example": "Ana Maria"
+                },
+                "sobrenome": {
+                  "example": "da Silva"
+                },
+                "fone": {
+                  "example": "48999997070"
+                },
+                "profissao": {
+                  "example": "Desenvolvedora"
+                },
+                "cidade": {
+                  "example": "Florianópolis"
+                },
+                "estado": {
+                  "example": "SC"
+                },
+                "imagem": {
+                  "example": "imagem.jpg"
+                },
+                "areas": {
+                  "example": "Tecnologia"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "208": {
+            "description": "Already Reported"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/talentos/{id}": {
+      "get": {
+        "description": "Mostra o talento cadastrado no banco de dados filtrado pelo id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "put": {
+        "description": "Método para fazer a alteração dos dados de talentos já cadastrados.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "password": {
+                  "example": "123456"
+                },
+                "nome": {
+                  "example": "Ana Maria"
+                },
+                "sobrenome": {
+                  "example": "Da Silva"
+                },
+                "fone": {
+                  "example": "48999997070"
+                },
+                "email": {
+                  "example": "ana@gmail.com"
+                },
+                "profissao": {
+                  "example": "Desenvolvedora"
+                },
+                "cidade": {
+                  "example": "Palhoça"
+                },
+                "estado": {
+                  "example": "SC"
+                },
+                "imagem": {
+                  "example": "imagem.jpg"
+                },
+                "area_id": {
+                  "example": "6"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "description": "Exclusão do talento pelo id no banco de dados.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/talentos/login": {
+      "post": {
+        "description": "Método para fazer o login do talento.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "ana@gmail.com"
+                },
+                "password": {
+                  "example": "123456"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/areas": {
+      "get": {
+        "description": "Mostra todas as áreas do banco de dados.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "description": "Cadastra uma área no banco de dados.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "area": {
+                  "example": "Tecnologia"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "208": {
+            "description": "Already Reported"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/areas/{id}": {
+      "get": {
+        "description": "Pesquisa uma área existente no banco de dados pelo id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "put": {
+        "description": "Altera uma área no banco de dados.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "area": {
+                  "example": "Engenharias"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "description": "Deleta yuma área do banco de dados pelo id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  }
+}
