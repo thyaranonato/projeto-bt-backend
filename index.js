@@ -22,28 +22,6 @@ const pool = new pg.Pool({
   }
 });
 
-app.get('/', (_req, res) => {
-  res.status(200).send({
-    message: 'Servidor em execução!!'
-  });
-});
-
-app.get('/criartabelatalentos', (_req, res) => {
-  pool.connect((err, client) => {
-    if (err) {
-      return res.status(401).send('Conexão não autorizada')
-    }
-    let sql = 'CREATE TABLE talentos (id SERIAL PRIMARY KEY NOT NULL, nome VARCHAR(20) NOT NULL, sobrenome VARCHAR(70) NOT NULL, fone VARCHAR(15) NOT NULL, email VARCHAR(50) NOT NULL, password VARCHAR(200) NOT NULL, profissao VARCHAR(60) NOT NULL, cidade VARCHAR(100) NOT NULL, estado VARCHAR(30) NOT NULL, imagem VARCHAR(500) NOT NULL, perfil VARCHAR(10))'
-    client.query(sql, (error, result) => {
-      if (error) {
-        return res.status(401).send('Operação não autorizada')
-      }
-      res.status(200).send(result.rows)
-      client.release()
-    })
-  })
-})
-
 app.get('/talentos', (_req, res) => {
   pool.connect((err, client) => {
     if (err) {
