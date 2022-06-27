@@ -208,7 +208,7 @@ app.get('/areas', (_req, res) => {
     if (err) {
       return res.status(401).send('Conexão não autorizada')
     }
-    client.query('SELECT * FROM areas', (error, result) => {
+    client.query('SELECT * FROM areas ORDER BY area', (error, result) => {
       if (error) {
         return res.status(401).send('Não autorizado')
       }
